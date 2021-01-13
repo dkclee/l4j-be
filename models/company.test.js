@@ -138,7 +138,7 @@ describe("findAll", function () {
 
     // More complicated filtering
     const filter4 = {
-      maxEmployees: 2,
+      minEmployees: 2,
       maxEmployees: 3
     };
     companies = await Company.findAll(filter4);

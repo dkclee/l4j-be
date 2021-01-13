@@ -213,12 +213,6 @@ describe("GET /companies", function () {
       });
     expect(resp2.status).toEqual(400);
 
-    const resp3 = await request(app)
-      .get("/companies")
-      .query({
-        name: 1390
-      });
-    expect(resp3.status).toEqual(400);
   });
 
   test("fails: test next() handler", async function () {

@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForPartialFilter } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -45,11 +45,13 @@ class Company {
   }
 
   /** Find all companies.
-   *
+   * Takes in option filter object which can include:
+   *  {name, minEmployees, maxEmployees }
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filterBy) {
+    const { whereCols, values } = sqlForPartialFilter( filterBy);
     const companiesRes = await db.query(
           `SELECT handle,
                   name,
@@ -57,7 +59,8 @@ class Company {
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
-           ORDER BY name`);
+          ${whereCols} 
+           ORDER BY name`, values);
     return companiesRes.rows;
   }
 
