@@ -45,8 +45,10 @@ class Company {
   }
 
   /** Find all companies.
-   * Takes in option filter object which can include:
+   * 
+   * Takes in optional filter object which can include:
    *  {name, minEmployees, maxEmployees }
+   * 
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 

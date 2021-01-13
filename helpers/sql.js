@@ -37,9 +37,17 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *  filterBy: JS object with key-value pairs to filter in database
  * 
  * Returns:
- *  whereCols: string of column names equal to SQL parameter 
- *    '"first_name"=$1, "age"=$2'
- *  values: list of values to update for the columns given in setCols
+ *  whereCols: string that contains the where clause of the SQL query 
+ *             if filterBy has minEmployees, maxEmployees or name
+ *             - empty string if the keys above are not present
+ *  values: array of values to search by in the SQL query
+ *          - empty array if keys are not present
+ *  
+ *  Example: 
+ * { 
+ *    whereCols: "WHERE num_employees >= $1 AND name ILIKE $2",
+ *    values: [4, '%searchTerm%']
+ * }
  * 
 */
 
@@ -70,7 +78,7 @@ function sqlForPartialFilter(filterBy) {
   }
 
   return {
-    whereCols: 'WHERE ' + whereCols.join(" and "),
+    whereCols: 'WHERE ' + whereCols.join(" AND "),
     values,
   };
 }

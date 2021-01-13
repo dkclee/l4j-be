@@ -1,6 +1,6 @@
 "use strict";
 
-const { sqlForPartialUpdate } = require("./sql");
+const { sqlForPartialUpdate, sqlForPartialFilter } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 /* Test for sqlForPartialUpdate */
@@ -38,4 +38,34 @@ describe("sqlForPartialUpdate", function () {
     }
   });
   
+});
+
+describe("sqlForPartialFilter", function () {
+  test("works with valid data", function () {
+    const filterBy = {minEmployees: 3, name:"searchBy"};
+
+    const { whereCols, values } = sqlForPartialFilter(filterBy); 
+
+    expect(whereCols).toEqual('WHERE num_employees >= $1 AND name ILIKE $2');
+    expect(values).toEqual([3, '%searchBy%']);
+
+    const filterBy2 = {minEmployees: 1, maxEmployees:5, name:"searchTerm"};
+
+    const result = sqlForPartialFilter(filterBy2); 
+    const whereCols2 = result.whereCols;
+    const values2 = result.values;
+
+    expect(whereCols2).toEqual('WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3');
+    expect(values2).toEqual([1, 5, '%searchTerm%']);
+  });
+
+  test("works even if filterBy is an empty object", function () {
+    const filterBy = {};
+
+    const { whereCols, values } = sqlForPartialFilter(filterBy); 
+
+    expect(whereCols).toEqual('');
+    expect(values).toEqual([]);
+  });
+
 });
