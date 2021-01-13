@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForPartialFilter } = require("../helpers/sql");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -53,7 +53,7 @@ class Company {
    * */
 
   static async findAll(filterBy) {
-    const { whereClauses, values } = sqlForPartialFilter(filterBy);
+    const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
     const companiesRes = await db.query(
           `SELECT handle,
                   name,
@@ -145,6 +145,64 @@ class Company {
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
+
+  /** Translate data to filter into SQL Format. 
+ * Takes in:
+ *  filterBy: JS object with key-value pairs to filter in database
+ * 
+ * Returns:
+ *  whereCols: string that contains the where clause of the SQL query 
+ *             if filterBy has minEmployees, maxEmployees or name
+ *             - empty string if the keys above are not present
+ *  values: array of values to search by in the SQL query
+ *          - empty array if keys are not present
+ *  
+ *  Example: 
+ * { 
+ *    whereCols: "WHERE num_employees >= $1 AND name ILIKE $2",
+ *    values: [4, '%searchTerm%']
+ * }
+ * 
+*/
+
+static _sqlForPartialFilter(filters={}) {
+  if (Object.keys(filters).length === 0) {
+    return {
+      whereClauses: '',
+      values: [],
+    }
+  }
+
+  const whereClauses = [];
+  const values = [];
+  const {minEmployees, maxEmployees, name} = filters;
+
+  if (minEmployees && maxEmployees && +minEmployees > +maxEmployees) {
+    throw new BadRequestError(
+      `Min employees: ${minEmployees} cannot be larger than max 
+        employees: ${maxEmployees}`);
+  }
+
+  if (minEmployees !== undefined) {
+    whereClauses.push(`num_employees >= $${whereClauses.length + 1}`);
+    values.push(minEmployees);
+  }
+
+  if (maxEmployees !== undefined) {
+    whereClauses.push(`num_employees <= $${whereClauses.length + 1}`);
+    values.push(maxEmployees);
+  }
+
+  if (name !== undefined) {
+    whereClauses.push(`name ILIKE $${whereClauses.length + 1}`);
+    values.push(`%${name}%`);
+  }
+
+  return {
+    whereClauses: 'WHERE ' + whereClauses.join(" AND "),
+    values,
+  };
+}
 }
 
 
