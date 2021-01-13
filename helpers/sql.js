@@ -51,34 +51,41 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  * 
 */
 
-function sqlForPartialFilter(filterBy) {
-  if (filterBy === undefined || Object.keys(filterBy).length === 0) {
+function sqlForPartialFilter(filters={}) {
+  if (Object.keys(filters).length === 0) {
     return {
-      whereCols: '',
+      whereClauses: '',
       values: [],
     }
   }
 
-  const whereCols = [];
+  const whereClauses = [];
   const values = [];
+  const {minEmployees, maxEmployees, name} = filters;
 
-  if (filterBy.minEmployees) {
-    whereCols.push(`num_employees >= $${whereCols.length + 1}`);
-    values.push(filterBy.minEmployees);
+  if (minEmployees && maxEmployees && +minEmployees > +maxEmployees) {
+    throw new BadRequestError(
+      `Min employees: ${minEmployees} cannot be larger than max 
+        employees: ${maxEmployees}`);
   }
 
-  if (filterBy.maxEmployees) {
-    whereCols.push(`num_employees <= $${whereCols.length + 1}`);
-    values.push(filterBy.maxEmployees);
+  if (minEmployees !== undefined) {
+    whereClauses.push(`num_employees >= $${whereClauses.length + 1}`);
+    values.push(minEmployees);
   }
 
-  if (filterBy.name) {
-    whereCols.push(`name ILIKE $${whereCols.length + 1}`);
-    values.push(`%${filterBy.name}%`);
+  if (maxEmployees !== undefined) {
+    whereClauses.push(`num_employees <= $${whereClauses.length + 1}`);
+    values.push(maxEmployees);
+  }
+
+  if (name !== undefined) {
+    whereClauses.push(`name ILIKE $${whereClauses.length + 1}`);
+    values.push(`%${name}%`);
   }
 
   return {
-    whereCols: 'WHERE ' + whereCols.join(" AND "),
+    whereClauses: 'WHERE ' + whereClauses.join(" AND "),
     values,
   };
 }

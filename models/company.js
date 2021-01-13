@@ -53,7 +53,7 @@ class Company {
    * */
 
   static async findAll(filterBy) {
-    const { whereCols, values } = sqlForPartialFilter( filterBy);
+    const { whereClauses, values } = sqlForPartialFilter(filterBy);
     const companiesRes = await db.query(
           `SELECT handle,
                   name,
@@ -61,7 +61,7 @@ class Company {
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
-          ${whereCols} 
+          ${whereClauses} 
            ORDER BY name`, values);
     return companiesRes.rows;
   }
