@@ -234,6 +234,53 @@ describe("get", function () {
     }
   });
 });
+/************************************** getByCompanyHandle */
+
+describe("getByCompanyHandle", function () {
+  test("works", async function () {
+    let jobs = await Job.getByCompanyHandle("c1");
+    expect(jobs).toEqual(
+      [
+        {
+          id: expect.any(Number),
+          title: "j1",
+          salary: 100,
+          equity: "0.1",
+        }
+      ]
+    );
+
+    let jobs2 = await Job.getByCompanyHandle("c2");
+    expect(jobs2).toEqual(
+      [
+        {
+          id: expect.any(Number),
+          title: "j2",
+          salary: 200,
+          equity: "0.2",
+        },
+        {
+          id: expect.any(Number),
+          title: "j3",
+          salary: 300,
+          equity: "0.3",
+        },
+      ]
+    );
+
+    let jobs3 = await Job.getByCompanyHandle("c3");
+    expect(jobs3).toEqual([]);
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await Job.getByCompanyHandle("Invalid Company Handle");
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
 
 // /************************************** update */
 

@@ -91,6 +91,40 @@ class Job {
     return job;
   }
 
+  /** Given a company handle, return data about the jobs.
+   *
+   * Returns [{ id, title, salary, equity }, ...]
+   *
+   * Throws NotFoundError if company handle doesn't exist.
+   * 
+   * Returns empty array if no job is found
+   **/
+
+  static async getByCompanyHandle(companyHandle) {
+
+    const checkCompanyHandle = await db.query(
+      `SELECT handle 
+           FROM companies
+           WHERE handle = $1`,
+      [companyHandle]);
+
+    if (checkCompanyHandle.rows[0] === undefined) 
+      throw new NotFoundError(`No company: ${companyHandle}`);
+
+    const jobsRes = await db.query(
+      `SELECT id,
+              title, 
+              salary, 
+              equity
+           FROM jobs
+           WHERE company_handle = $1`,
+      [companyHandle]);
+
+    const jobs = jobsRes.rows;
+
+    return jobs;
+  }
+
   /** Update job data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain all the
