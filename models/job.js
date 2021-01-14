@@ -121,7 +121,7 @@ class Job {
     return job;
   }
 
-  /** Delete given job from database; returns undefined.
+  /** Delete given job from database; returns id of job removed.
    *
    * Throws NotFoundError if job not found.
    **/
@@ -136,6 +136,7 @@ class Job {
     const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`No job: ${id}`);
+    return job.id;
   }
 
   /** Translate data to filter into SQL Format. 
@@ -143,16 +144,16 @@ class Job {
    *  filterBy: JS object with key-value pairs to filter in database
    * 
    * Returns:
-   *  whereCols: string that contains the where clause of the SQL query 
-   *             if filterBy has minEmployees, maxEmployees or name
+   *  whereClauses: string that contains the where clause of the SQL query 
+   *             if filterBy has title, minSalary, or hasEquity
    *             - empty string if the keys above are not present
    *  values: array of values to search by in the SQL query
    *          - empty array if keys are not present
    *  
    *  Example: 
    * { 
-   *    whereCols: "WHERE num_employees >= $1 AND name ILIKE $2",
-   *    values: [4, '%searchTerm%']
+   *    whereCols: 'WHERE salary >= $1 AND equity > 0',
+   *    values: [200]
    * }
    * 
   */
@@ -167,27 +168,28 @@ class Job {
 
     const whereClauses = [];
     const values = [];
-    const { minEmployees, maxEmployees, name } = filters;
-
-    if (minEmployees && maxEmployees && +minEmployees > +maxEmployees) {
-      throw new BadRequestError(
-        `Min employees: ${minEmployees} cannot be larger than max 
-        employees: ${maxEmployees}`);
+    const { title, minSalary, hasEquity } = filters;
+    
+    // check for the case where hasEquity is false and title & minSalary are undefined
+    if (!title && !minSalary && !hasEquity) {
+      return {
+        whereClauses: '',
+        values: [],
+      }
     }
 
-    if (minEmployees !== undefined) {
-      whereClauses.push(`num_employees >= $${whereClauses.length + 1}`);
-      values.push(minEmployees);
+      if (title !== undefined) {
+        whereClauses.push(`title ILIKE $${whereClauses.length + 1}`);
+        values.push(`%${title}%`);
+      }
+
+    if (minSalary !== undefined) {
+      whereClauses.push(`salary >= $${whereClauses.length + 1}`);
+      values.push(minSalary);
     }
 
-    if (maxEmployees !== undefined) {
-      whereClauses.push(`num_employees <= $${whereClauses.length + 1}`);
-      values.push(maxEmployees);
-    }
-
-    if (name !== undefined) {
-      whereClauses.push(`name ILIKE $${whereClauses.length + 1}`);
-      values.push(`%${name}%`);
+    if (hasEquity === true) {
+      whereClauses.push(`equity > 0`);
     }
 
     return {

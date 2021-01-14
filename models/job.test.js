@@ -334,49 +334,43 @@ describe("remove", function () {
   });
 });
 
-// /************************************** _sqlForPartialFilter */
+/************************************** _sqlForPartialFilter */
 
 
-// describe("sqlForPartialFilter", function () {
-//   test("works with valid data", function () {
-//     const filterBy = { minEmployees: 3, name: "searchBy" };
+describe("sqlForPartialFilter", function () {
+  test("works with valid data", function () {
+    const filterBy = { minSalary: 200, hasEquity: true };
 
-//     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
+    const { whereClauses, values } = Job._sqlForPartialFilter(filterBy);
 
-//     expect(whereClauses).toEqual('WHERE num_employees >= $1 AND name ILIKE $2');
-//     expect(values).toEqual([3, '%searchBy%']);
+    expect(whereClauses).toEqual('WHERE salary >= $1 AND equity > 0');
+    expect(values).toEqual([200]);
 
-//     const filterBy2 = { minEmployees: 1, maxEmployees: 5, name: "searchTerm" };
+    const filterBy2 = { hasEquity: false };
 
-//     const result = Company._sqlForPartialFilter(filterBy2);
-//     const whereClauses2 = result.whereClauses;
-//     const values2 = result.values;
+    const result2 = Job._sqlForPartialFilter(filterBy2);
+    const whereClauses2 = result2.whereClauses;
+    const values2 = result2.values;
 
-//     expect(whereClauses2).toEqual('WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3');
-//     expect(values2).toEqual([1, 5, '%searchTerm%']);
-//   });
+    expect(whereClauses2).toEqual('');
+    expect(values2).toEqual([]);
 
-//   test("works even if filterBy is an empty object", function () {
-//     const filterBy = {};
+    const filterBy3 = { minSalary: 200, title: '3' };
 
-//     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
+    const result3 = Job._sqlForPartialFilter(filterBy3);
+    const whereClauses3 = result3.whereClauses;
+    const values3 = result3.values;
 
-//     expect(whereClauses).toEqual('');
-//     expect(values).toEqual([]);
-//   });
+    expect(whereClauses3).toEqual('WHERE title ILIKE $1 AND salary >= $2');
+    expect(values3).toEqual(['%3%', 200]);
+  });
 
-//   test("fails: minEmployees must be smaller than maxEmployees", function () {
-//     const filter = {
-//       minEmployees: 2,
-//       maxEmployees: 1
-//     };
+  test("works even if filterBy is an empty object", function () {
+    const filterBy = {};
+    const { whereClauses, values } = Job._sqlForPartialFilter(filterBy);
 
-//     try {
-//       const { whereClauses, values } = Company._sqlForPartialFilter(filter);
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
+    expect(whereClauses).toEqual('');
+    expect(values).toEqual([]);
+  });
 
-// });
+});

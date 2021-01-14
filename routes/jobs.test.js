@@ -86,21 +86,21 @@ describe("GET /jobs", function () {
             id: expect.any(Number),
             title: 'j1', 
             salary: 100,
-            equity: 0.1,
+            equity: "0.1",
             companyHandle: 'c1'
           },
           {
             id: expect.any(Number),
             title: 'j2', 
             salary: 200,
-            equity: 0.2,
+            equity: "0.2",
             companyHandle: 'c2'
           },
           {
             id: expect.any(Number),
             title: 'j3', 
             salary: 300,
-            equity: 0.3,
+            equity: "0.3",
             companyHandle: 'c2'
           }
         ],
@@ -264,6 +264,7 @@ describe("GET /jobs/:id", function () {
     expect(resp.body).toEqual({
       job: {
         ...newJob,
+        equity: "0.11",
         id
       },
     });
@@ -307,7 +308,7 @@ describe("PATCH /jobs/:id", function () {
         id,
         title: 'newUpdated', 
         salary: 1000,
-        equity: 0.11,
+        equity: "0.11",
         companyHandle: 'c1'
       },
     });
