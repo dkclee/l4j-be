@@ -256,7 +256,6 @@ describe("GET /companies/:handle", function () {
             title: 'j1', 
             salary: 100,
             equity: "0.1",
-            companyHandle: 'c1'
           }
         ]
       },
