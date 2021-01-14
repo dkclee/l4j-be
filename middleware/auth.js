@@ -48,14 +48,10 @@ function ensureLoggedIn(req, res, next) {
  */
 
 function ensureAdmin(req, res, next) {
-  try {
-    // return !undefined if no user is logged in
-    // check if both there is a user logged in and if that user is an admin
-    if (!res.locals.user?.isAdmin) throw new UnauthorizedError();
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+  // return !undefined if no user is logged in
+  // check if both there is a user logged in and if that user is an admin
+  if (!res.locals.user?.isAdmin) throw new UnauthorizedError();
+  return next();
 }
 
 /** Middleware to check if the user is an admin
@@ -75,6 +71,7 @@ function ensureAdminOrSelf(req, res, next) {
   } catch (err) {
     return next(err);
   }
+
 }
 
 
