@@ -6,6 +6,8 @@ const Company = require("../models/company");
 const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 
+const testJobIds = [];
+
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");

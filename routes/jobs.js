@@ -12,7 +12,6 @@ const Job = require("../models/job");
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
 const jobsFilterSchema = require("../schemas/jobsFilter.json");
-// const companyNewSchema = require("../schemas/companyNew.json");
 
 const router = new express.Router();
 
@@ -50,20 +49,21 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  const data = {...req.query};
-  if (data.minSalary !== undefined) data.minSalary = Number(data.minSalary);
-  if (data.hasEquity !== undefined) {
-    if (data.hasEquity === "true") data.hasEquity = true;
-    if (data.hasEquity === "false") data.hasEquity = false;
+  const q = {...req.query};
+  const {minSalary, hasEquity} = q;
+  if (minSalary !== undefined) q.minSalary = Number(minSalary);
+  if (hasEquity !== undefined) {
+    if (hasEquity === "true") q.hasEquity = true;
+    if (hasEquity === "false") q.hasEquity = false;
   }
 
-  const validator = jsonschema.validate(data, jobsFilterSchema);
+  const validator = jsonschema.validate(q, jobsFilterSchema);
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   }
   
-  const jobs = await Job.findAll(data);
+  const jobs = await Job.findAll(q);
   return res.json({ jobs });
 });
 

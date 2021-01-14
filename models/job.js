@@ -51,7 +51,7 @@ class Job {
    * Returns [{ id, title, salary, equity, companyHandle }, ...]
    * */
 
-  static async findAll(filters) {
+  static async findAll(filters={}) {
     const {whereClauses, values} = Job._sqlForPartialFilter(filters)
     const jobRes = await db.query(
       `SELECT id,
@@ -100,7 +100,7 @@ class Job {
    * Returns empty array if no job is found
    **/
 
-  static async getByCompanyHandle(companyHandle) {
+  static async findAllByCompanyHandle(companyHandle) {
 
     const checkCompanyHandle = await db.query(
       `SELECT handle 

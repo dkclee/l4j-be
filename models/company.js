@@ -92,7 +92,7 @@ class Company {
     if (!company) throw new NotFoundError(`No company: ${handle}`);
     
     // Get all the jobs for this company
-    company.jobs = await Job.getByCompanyHandle(handle);
+    company.jobs = await Job.findAllByCompanyHandle(handle);
 
     return company;
   }

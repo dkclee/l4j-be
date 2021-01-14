@@ -234,11 +234,11 @@ describe("get", function () {
     }
   });
 });
-/************************************** getByCompanyHandle */
+/************************************** findAllByCompanyHandle */
 
-describe("getByCompanyHandle", function () {
+describe("findAllByCompanyHandle", function () {
   test("works", async function () {
-    let jobs = await Job.getByCompanyHandle("c1");
+    let jobs = await Job.findAllByCompanyHandle("c1");
     expect(jobs).toEqual(
       [
         {
@@ -250,7 +250,7 @@ describe("getByCompanyHandle", function () {
       ]
     );
 
-    let jobs2 = await Job.getByCompanyHandle("c2");
+    let jobs2 = await Job.findAllByCompanyHandle("c2");
     expect(jobs2).toEqual(
       [
         {
@@ -268,13 +268,13 @@ describe("getByCompanyHandle", function () {
       ]
     );
 
-    let jobs3 = await Job.getByCompanyHandle("c3");
+    let jobs3 = await Job.findAllByCompanyHandle("c3");
     expect(jobs3).toEqual([]);
   });
 
   test("not found if no such job", async function () {
     try {
-      await Job.getByCompanyHandle("Invalid Company Handle");
+      await Job.findAllByCompanyHandle("Invalid Company Handle");
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();

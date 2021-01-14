@@ -37,17 +37,20 @@ class BadRequestError extends ExpressError {
 }
 
 /** 403 FORBIDDEN error. */
+// Common for API's that other API's are talking to but 
+// the web can talk with them as well 
+// - Ex: you are using an older version of zoom 
 
-class ForbiddenError extends ExpressError {
-  constructor(message = "Bad Request") {
-    super(message, 403);
-  }
-}
+// class ForbiddenError extends ExpressError {
+//   constructor(message = "Bad Request") {
+//     super(message, 403);
+//   }
+// }
 
 module.exports = {
   ExpressError,
   NotFoundError,
   UnauthorizedError,
   BadRequestError,
-  ForbiddenError,
+  // ForbiddenError,
 };
