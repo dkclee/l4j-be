@@ -19,6 +19,8 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+// TODO: add an array of ids in _testCommon to minimize the beforeEach functions needed in these tests.
+// Also, change variable names of u1Token to adminToken
 /************************************** POST /jobs */
 
 describe("POST /jobs", function () {

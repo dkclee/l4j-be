@@ -173,7 +173,6 @@ class Job {
     const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`No job: ${id}`);
-    return job.id;
   }
 
   /** Translate data to filter into SQL Format. 
@@ -195,7 +194,7 @@ class Job {
    * 
   */
 
-  static _sqlForPartialFilter(filters = {}) {
+  static _sqlForPartialFilter(filters) {
     if (Object.keys(filters).length === 0) {
       return {
         whereClauses: '',

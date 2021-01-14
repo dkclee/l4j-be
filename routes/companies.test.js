@@ -5,6 +5,8 @@ const request = require("supertest");
 const db = require("../db");
 const app = require("../app");
 
+// TODO: change name of tokens to adminToken and userToken
+
 const {
   commonBeforeAll,
   commonBeforeEach,

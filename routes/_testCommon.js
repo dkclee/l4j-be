@@ -6,7 +6,8 @@ const Company = require("../models/company");
 const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 
-const testJobIds = [];
+// TODO: fill this out
+// const testJobIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -66,6 +67,8 @@ async function commonBeforeAll() {
     isAdmin: false,
   });
   
+
+  // TODO can store the job ids in a variable here so we don't need to call Job.create in the tests.
   await Job.create({
     title: 'j1', 
     salary: 100,
@@ -100,7 +103,7 @@ async function commonAfterAll() {
   await db.end();
 }
 
-
+// TODO: change naming of u1Token and u2Token to adminToken and userToken
 const u1Token = createToken({ username: "u1", isAdmin: true });
 const u2Token = createToken({ username: "u2", isAdmin: false });
 
