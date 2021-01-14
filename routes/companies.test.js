@@ -68,7 +68,6 @@ describe("POST /companies", function () {
       .post("/companies")
       .send({
         ...newCompany,
-        logoUrl: "not-a-url",
       })
       .set("authorization", `Bearer ${u2Token}`);
     expect(resp.statusCode).toEqual(401);
