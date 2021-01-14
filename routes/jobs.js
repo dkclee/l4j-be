@@ -11,8 +11,8 @@ const Job = require("../models/job");
 
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
+const jobsFilterSchema = require("../schemas/jobsFilter.json");
 // const companyNewSchema = require("../schemas/companyNew.json");
-// const companiesFilterSchema = require("../schemas/companiesFilter.json");
 
 const router = new express.Router();
 
@@ -40,22 +40,30 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 /** GET /  =>
  *   { jobs: [ { id, title, salary, equity, companyHandle }, ...] }
  *
- * TODO: UPDATE THIS Can filter on provided search filters:
- * - minEmployees
- * - maxEmployees
- * - nameLike (will find case-insensitive, partial matches)
+ * TODO: Can filter on provided search filters:
+ * - title (will find case-insensitive, partial matches)
+ * - minSalary
+ * - hasEquity (true: jobs that provide a non-zero amount of equity, 
+ *              false: list all jobs regardless of equity)
  *
  * Authorization required: none
  */
 
 router.get("/", async function (req, res, next) {
-  // const validator = jsonschema.validate(req.query, companiesFilterSchema);
-  // if (!validator.valid) {
-  //   const errs = validator.errors.map(e => e.stack);
-  //   throw new BadRequestError(errs);
-  // }
+  const data = {...req.query};
+  if (data.minSalary !== undefined) data.minSalary = Number(data.minSalary);
+  if (data.hasEquity !== undefined) {
+    if (data.hasEquity === "true") data.hasEquity = true;
+    if (data.hasEquity === "false") data.hasEquity = false;
+  }
+
+  const validator = jsonschema.validate(data, jobsFilterSchema);
+  if (!validator.valid) {
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
+  }
   
-  const jobs = await Job.findAll(req.query);
+  const jobs = await Job.findAll(data);
   return res.json({ jobs });
 });
 

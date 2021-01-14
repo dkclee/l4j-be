@@ -126,11 +126,11 @@ describe("GET /jobs", function () {
         ],
     });
 
-    // The search term can be anywhere in the name (not only begins with or ends with)
+    // The search term can be anywhere in the title (not only begins with or ends with)
     resp = await request(app)
       .get("/jobs")
       .query({
-        name: "1",
+        title: "1",
       });
     expect(resp.body).toEqual({
       jobs:
@@ -248,7 +248,7 @@ describe("GET /jobs", function () {
             id: expect.any(Number),
             title: 'new', 
             salary: 10,
-            equity: 0,
+            equity: "0",
             companyHandle: 'c1'
           }
         ]
@@ -282,7 +282,7 @@ describe("GET /jobs", function () {
     const resp3 = await request(app)
       .get("/jobs")
       .query({
-        title: 12345
+        title: ''
       });
     expect(resp3.status).toEqual(400);
   });
