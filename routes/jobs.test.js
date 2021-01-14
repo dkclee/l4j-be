@@ -107,124 +107,185 @@ describe("GET /jobs", function () {
     });
   });
 
-  // test("filtering companies correctly", async function () {
-  //   let resp = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       name: "c1",
-  //     });
-  //   expect(resp.body).toEqual({
-  //     companies:
-  //       [
-  //         {
-  //           handle: "c1",
-  //           name: "C1",
-  //           description: "Desc1",
-  //           numEmployees: 1,
-  //           logoUrl: "http://c1.img",
-  //         }
-  //       ],
-  //   });
+  test("filtering jobs correctly", async function () {
+    let resp = await request(app)
+      .get("/jobs")
+      .query({
+        title: "J1", // search term is case insensitive
+      });
+    expect(resp.body).toEqual({
+      jobs:
+        [
+          {
+            id: expect.any(Number),
+            title: 'j1', 
+            salary: 100,
+            equity: "0.1",
+            companyHandle: 'c1'
+          }
+        ],
+    });
 
-  //   // The search term can be anywhere in the name (not only begins with or ends with)
-  //   resp = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       name: "1",
-  //     });
-  //   expect(resp.body).toEqual({
-  //     companies:
-  //       [
-  //         {
-  //           handle: "c1",
-  //           name: "C1",
-  //           description: "Desc1",
-  //           numEmployees: 1,
-  //           logoUrl: "http://c1.img",
-  //         }
-  //       ],
-  //   });
+    // The search term can be anywhere in the name (not only begins with or ends with)
+    resp = await request(app)
+      .get("/jobs")
+      .query({
+        name: "1",
+      });
+    expect(resp.body).toEqual({
+      jobs:
+        [
+          {
+            id: expect.any(Number),
+            title: 'j1', 
+            salary: 100,
+            equity: "0.1",
+            companyHandle: 'c1'
+          }
+        ],
+    });
 
-  //   const resp2 = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       minEmployees: 2,
-  //     });
-  //   expect(resp2.body).toEqual({
-  //     companies:
-  //       [
-  //         {
-  //           handle: "c2",
-  //           name: "C2",
-  //           description: "Desc2",
-  //           numEmployees: 2,
-  //           logoUrl: "http://c2.img",
-  //         },
-  //         {
-  //           handle: "c3",
-  //           name: "C3",
-  //           description: "Desc3",
-  //           numEmployees: 3,
-  //           logoUrl: "http://c3.img",
-  //         }
-  //       ]
-  //   });
+    const resp2 = await request(app)
+      .get("/jobs")
+      .query({
+        minSalary: 150,
+      });
+    expect(resp2.body).toEqual({
+      jobs:
+        [
+          {
+            id: expect.any(Number),
+            title: 'j2', 
+            salary: 200,
+            equity: "0.2",
+            companyHandle: 'c2'
+          },
+          {
+            id: expect.any(Number),
+            title: 'j3', 
+            salary: 300,
+            equity: "0.3",
+            companyHandle: 'c2'
+          }
+        ]
+    });
 
-  //   const resp3 = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       maxEmployees: 2,
-  //     });
-  //   expect(resp3.body).toEqual({
-  //     companies:
-  //       [
-  //         {
-  //           handle: "c1",
-  //           name: "C1",
-  //           description: "Desc1",
-  //           numEmployees: 1,
-  //           logoUrl: "http://c1.img",
-  //         },
-  //         {
-  //           handle: "c2",
-  //           name: "C2",
-  //           description: "Desc2",
-  //           numEmployees: 2,
-  //           logoUrl: "http://c2.img",
-  //         }
-  //       ]
-  //   });
+    const newJob = {
+      title: 'new', 
+      salary: 10,
+      equity: 0,
+      companyHandle: 'c1'
+    };
+  
+    // Create a new job with no equity
+    const respNewJobNoEquity = await request(app)
+      .post("/jobs")
+      .send(newJob)
+      .set("authorization", `Bearer ${u1Token}`);
 
-  // });
+    const resp3 = await request(app)
+      .get("/jobs")
+      .query({
+        hasEquity: true,
+      });
+    expect(resp3.body).toEqual({
+      jobs:
+        [
+          {
+            id: expect.any(Number),
+            title: 'j1', 
+            salary: 100,
+            equity: "0.1",
+            companyHandle: 'c1'
+          },
+          {
+            id: expect.any(Number),
+            title: 'j2', 
+            salary: 200,
+            equity: "0.2",
+            companyHandle: 'c2'
+          },
+          {
+            id: expect.any(Number),
+            title: 'j3', 
+            salary: 300,
+            equity: "0.3",
+            companyHandle: 'c2'
+          }
+        ]
+    });
 
-  // test("fails: minEmployees must be smaller than maxEmployees", async function () {
-  //   const resp = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       minEmployees: 2,
-  //       maxEmployees: 1
-  //     });
-  //   expect(resp.status).toEqual(400);
-  // });
+    const resp4 = await request(app)
+      .get("/jobs")
+      .query({
+        hasEquity: false,
+      });
+    expect(resp4.body).toEqual({
+      jobs:
+        [
+          {
+            id: expect.any(Number),
+            title: 'j1', 
+            salary: 100,
+            equity: "0.1",
+            companyHandle: 'c1'
+          },
+          {
+            id: expect.any(Number),
+            title: 'j2', 
+            salary: 200,
+            equity: "0.2",
+            companyHandle: 'c2'
+          },
+          {
+            id: expect.any(Number),
+            title: 'j3', 
+            salary: 300,
+            equity: "0.3",
+            companyHandle: 'c2'
+          },
+          {
+            id: expect.any(Number),
+            title: 'new', 
+            salary: 10,
+            equity: 0,
+            companyHandle: 'c1'
+          }
+        ]
+    });
+  });
 
-  // test("fails: if other parameters are included other than name, minEmployees and maxEmployees", async function () {
-  //   const resp = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       invalidParameter: 2
-  //     });
-  //   expect(resp.status).toEqual(400);
-  // });
+  test("fails: if other parameters are included other than title, minSalary and hasEquity", async function () {
+    const resp = await request(app)
+      .get("/jobs")
+      .query({
+        invalidParameter: 2
+      });
+    expect(resp.status).toEqual(400);
+  });
 
-  // test("fails: invalid data types", async function () {
-  //   const resp2 = await request(app)
-  //     .get("/companies")
-  //     .query({
-  //       minEmployees: "not an integer"
-  //     });
-  //   expect(resp2.status).toEqual(400);
+  test("fails: invalid data types", async function () {
+    const resp = await request(app)
+      .get("/jobs")
+      .query({
+        hasEquity: "not an boolean"
+      });
+    expect(resp.status).toEqual(400);
 
-  // });
+    const resp2 = await request(app)
+      .get("/jobs")
+      .query({
+        minSalary: "not an integer"
+      });
+    expect(resp2.status).toEqual(400);
+
+    const resp3 = await request(app)
+      .get("/jobs")
+      .query({
+        title: 12345
+      });
+    expect(resp3.status).toEqual(400);
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
