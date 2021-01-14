@@ -12,13 +12,14 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
+  testJobIds
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
+
 
 /************************************** authenticate */
 
@@ -235,21 +236,20 @@ describe("remove", function () {
 
 describe("applyForJob", function () {
   test("works", async function () {
-    // console.log('testJobIds', testJobIds);
-    await User.applyForJob("u2", 1);
+    await User.applyForJob("u2", testJobIds[0]);
     const res = await db.query(
         `SELECT username, job_id AS "jobId"
           FROM applications 
-          WHERE username='u2' AND job_id = ${1}`);
+          WHERE username='u2' AND job_id = ${testJobIds[0]}`);
     expect(res.rows[0]).toEqual({
       username: 'u2',
-      jobId: 1
+      jobId: testJobIds[0]
     });
   });
 
   test("not found if no such user", async function () {
     try {
-      await User.applyForJob("nope", 1);
+      await User.applyForJob("nope", testJobIds[0]);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
@@ -267,7 +267,7 @@ describe("applyForJob", function () {
 
   test("bad request if user already applied to job", async function () {
     try {
-      await User.applyForJob("u1", 1);
+      await User.applyForJob("u1", testJobIds[0]);
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();

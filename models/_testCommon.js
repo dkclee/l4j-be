@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
-let testJobIds;
+let testJobIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -26,7 +26,7 @@ async function commonBeforeAll() {
            ('j3', 300, 0.3, 'c2')
     RETURNING id`);
 
-  testJobIds = jobRes.rows;
+  testJobIds.splice(0, 0, ...jobRes.rows.map(j => j.id));
 
   await db.query(`
         INSERT INTO users(username,
@@ -61,10 +61,11 @@ async function commonAfterAll() {
 }
 
 
+
 module.exports = {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
+  testJobIds
 };
