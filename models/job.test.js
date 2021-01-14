@@ -18,37 +18,47 @@ afterAll(commonAfterAll);
 /************************************** create */
 
 describe("create", function () {
-  const newCompany = {
-    handle: "new",
-    name: "New",
-    description: "New Description",
-    numEmployees: 1,
-    logoUrl: "http://new.img",
+  const newJob = {
+    title: "new",
+    salary: 500,
+    equity: 0.5,
+    companyHandle: "c1",
   };
 
   test("works", async function () {
-    let company = await Company.create(newCompany);
-    expect(company).toEqual(newCompany);
+    let job = await Job.create(newJob);
+    expect(job).toEqual({
+      title: "new",
+      salary: 500,
+      equity: "0.5",
+      companyHandle: "c1",
+      id: expect.any(Number)
+    });
 
     const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'new'`);
+      `SELECT title, salary, equity, company_handle AS "companyHandle"
+           FROM jobs
+           WHERE title = 'new'`);
     expect(result.rows).toEqual([
       {
-        handle: "new",
-        name: "New",
-        description: "New Description",
-        num_employees: 1,
-        logo_url: "http://new.img",
+        title: "new",
+        salary: 500,
+        equity: "0.5",
+        companyHandle: "c1",
       },
     ]);
   });
 
-  test("bad request with dupe", async function () {
+  test("bad request if company handle doesn't exist", async function () {
+    const newJobBadData = {
+      title: "new",
+      salary: 500,
+      equity: 0.5,
+      companyHandle: "notExist",
+    };
+
     try {
-      await Company.create(newCompany);
-      await Company.create(newCompany);
+      await Job.create(newJobBadData);
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
@@ -60,124 +70,134 @@ describe("create", function () {
 
 describe("findAll", function () {
   test("works: no filter", async function () {
-    let companies = await Company.findAll();
-    expect(companies).toEqual([
+    let jobs = await Job.findAll();
+    expect(jobs).toEqual([
       {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
+        id: expect.any(Number),
+        title: "j1",
+        salary: 100,
+        equity: "0.1",
+        companyHandle: "c1",
       },
       {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200,
+        equity: "0.2",
+        companyHandle: "c2",
       },
       {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300,
+        equity: "0.3",
+        companyHandle: "c2",
       },
     ]);
   });
 
-  test("works: filter", async function () {
-    const filter = {
-      name: "c1"
-    };
-    let companies = await Company.findAll(filter);
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      }
-    ]);
+  // test("works: filter", async function () {
+  //   const filter = {
+  //     name: "c1"
+  //   };
+  //   let companies = await Company.findAll(filter);
+  //   expect(companies).toEqual([
+  //     {
+  //       handle: "c1",
+  //       name: "C1",
+  //       description: "Desc1",
+  //       numEmployees: 1,
+  //       logoUrl: "http://c1.img",
+  //     }
+  //   ]);
 
-    const filter2 = {
-      minEmployees: 3
-    };
-    companies = await Company.findAll(filter2);
-    expect(companies).toEqual([
-      {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
-      }
-    ]);
+  //   const filter2 = {
+  //     minEmployees: 3
+  //   };
+  //   companies = await Company.findAll(filter2);
+  //   expect(companies).toEqual([
+  //     {
+  //       handle: "c3",
+  //       name: "C3",
+  //       description: "Desc3",
+  //       numEmployees: 3,
+  //       logoUrl: "http://c3.img",
+  //     }
+  //   ]);
 
-    const filter3 = {
-      maxEmployees: 2
-    };
-    companies = await Company.findAll(filter3);
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      }
-    ]);
+  //   const filter3 = {
+  //     maxEmployees: 2
+  //   };
+  //   companies = await Company.findAll(filter3);
+  //   expect(companies).toEqual([
+  //     {
+  //       handle: "c1",
+  //       name: "C1",
+  //       description: "Desc1",
+  //       numEmployees: 1,
+  //       logoUrl: "http://c1.img",
+  //     },
+  //     {
+  //       handle: "c2",
+  //       name: "C2",
+  //       description: "Desc2",
+  //       numEmployees: 2,
+  //       logoUrl: "http://c2.img",
+  //     }
+  //   ]);
 
-    // More complicated filtering
-    const filter4 = {
-      minEmployees: 2,
-      maxEmployees: 3
-    };
-    companies = await Company.findAll(filter4);
-    expect(companies).toEqual([
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
-      {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
-      }
-    ]);
-  });
+  //   // More complicated filtering
+  //   const filter4 = {
+  //     minEmployees: 2,
+  //     maxEmployees: 3
+  //   };
+  //   companies = await Company.findAll(filter4);
+  //   expect(companies).toEqual([
+  //     {
+  //       handle: "c2",
+  //       name: "C2",
+  //       description: "Desc2",
+  //       numEmployees: 2,
+  //       logoUrl: "http://c2.img",
+  //     },
+  //     {
+  //       handle: "c3",
+  //       name: "C3",
+  //       description: "Desc3",
+  //       numEmployees: 3,
+  //       logoUrl: "http://c3.img",
+  //     }
+  //   ]);
+  // });
 });
 
 /************************************** get */
 
 describe("get", function () {
   test("works", async function () {
-    let company = await Company.get("c1");
-    expect(company).toEqual({
-      handle: "c1",
-      name: "C1",
-      description: "Desc1",
-      numEmployees: 1,
-      logoUrl: "http://c1.img",
+    const newJob = {
+      title: "new",
+      salary: 500,
+      equity: 0.5,
+      companyHandle: "c1",
+    };
+
+    let jobCreated = await Job.create(newJob);
+    const id = jobCreated.id;
+
+    let job = await Job.get(id);
+    expect(job).toEqual({
+      id,
+      title: "new",
+      salary: 500,
+      equity: "0.5",
+      companyHandle: "c1",
     });
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such job", async function () {
     try {
-      await Company.get("nope");
+      await Job.get(0);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
@@ -185,66 +205,81 @@ describe("get", function () {
   });
 });
 
-/************************************** update */
+// /************************************** update */
 
 describe("update", function () {
-  const updateData = {
-    name: "New",
-    description: "New Description",
-    numEmployees: 10,
-    logoUrl: "http://new.img",
+  const newJob = {
+    title: "newCreated",
+    salary: 500,
+    equity: 0.5,
+    companyHandle: "c1",
   };
 
+  const updateData = {
+    title: "newUpdate",
+  }
+
   test("works", async function () {
-    let company = await Company.update("c1", updateData);
-    expect(company).toEqual({
-      handle: "c1",
-      ...updateData,
+    let jobCreated = await Job.create(newJob);
+    const id = jobCreated.id;
+
+    let job = await Job.update(id, updateData);
+    expect(job).toEqual({
+      id,
+      title: "newUpdate",
+      salary: 500,
+      equity: "0.5",
+      companyHandle: "c1",
     });
 
     const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
+      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
+           FROM jobs
+           WHERE id = ${id}`);
     expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: 10,
-      logo_url: "http://new.img",
+      id,
+      title: "newUpdate",
+      salary: 500,
+      equity: "0.5",
+      companyHandle: "c1",
     }]);
   });
 
   test("works: null fields", async function () {
+    let jobCreated = await Job.create(newJob);
+    const id = jobCreated.id;
+
     const updateDataSetNulls = {
-      name: "New",
-      description: "New Description",
-      numEmployees: null,
-      logoUrl: null,
+      title: "newUpdate",
+      salary: null,
+      equity: null,
     };
 
-    let company = await Company.update("c1", updateDataSetNulls);
-    expect(company).toEqual({
-      handle: "c1",
-      ...updateDataSetNulls,
+    let job = await Job.update(id, updateDataSetNulls);
+    expect(job).toEqual({
+      id,
+      title: "newUpdate",
+      salary: null,
+      equity: null,
+      companyHandle: "c1",
     });
 
     const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
+      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
+          FROM jobs
+          WHERE id = ${id}`);
     expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: null,
-      logo_url: null,
+      id,
+      title: "newUpdate",
+      salary: null,
+      equity: null,
+      companyHandle: "c1",
     }]);
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such job", async function () {
     try {
-      await Company.update("nope", updateData);
+      await Job.update(0, updateData);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
@@ -252,8 +287,11 @@ describe("update", function () {
   });
 
   test("bad request with no data", async function () {
+    let jobCreated = await Job.create(newJob);
+    const id = jobCreated.id;
+
     try {
-      await Company.update("c1", {});
+      await Job.update(id, {});
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
@@ -261,69 +299,69 @@ describe("update", function () {
   });
 });
 
-/************************************** remove */
+// /************************************** remove */
 
-describe("remove", function () {
-  test("works", async function () {
-    await Company.remove("c1");
-    const res = await db.query(
-      "SELECT handle FROM companies WHERE handle='c1'");
-    expect(res.rows.length).toEqual(0);
-  });
+// describe("remove", function () {
+//   test("works", async function () {
+//     await Company.remove("c1");
+//     const res = await db.query(
+//       "SELECT handle FROM companies WHERE handle='c1'");
+//     expect(res.rows.length).toEqual(0);
+//   });
 
-  test("not found if no such company", async function () {
-    try {
-      await Company.remove("nope");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-});
+//   test("not found if no such company", async function () {
+//     try {
+//       await Company.remove("nope");
+//       fail();
+//     } catch (err) {
+//       expect(err instanceof NotFoundError).toBeTruthy();
+//     }
+//   });
+// });
 
-/************************************** _sqlForPartialFilter */
+// /************************************** _sqlForPartialFilter */
 
 
-describe("sqlForPartialFilter", function () {
-  test("works with valid data", function () {
-    const filterBy = { minEmployees: 3, name: "searchBy" };
+// describe("sqlForPartialFilter", function () {
+//   test("works with valid data", function () {
+//     const filterBy = { minEmployees: 3, name: "searchBy" };
 
-    const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
+//     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
 
-    expect(whereClauses).toEqual('WHERE num_employees >= $1 AND name ILIKE $2');
-    expect(values).toEqual([3, '%searchBy%']);
+//     expect(whereClauses).toEqual('WHERE num_employees >= $1 AND name ILIKE $2');
+//     expect(values).toEqual([3, '%searchBy%']);
 
-    const filterBy2 = { minEmployees: 1, maxEmployees: 5, name: "searchTerm" };
+//     const filterBy2 = { minEmployees: 1, maxEmployees: 5, name: "searchTerm" };
 
-    const result = Company._sqlForPartialFilter(filterBy2);
-    const whereClauses2 = result.whereClauses;
-    const values2 = result.values;
+//     const result = Company._sqlForPartialFilter(filterBy2);
+//     const whereClauses2 = result.whereClauses;
+//     const values2 = result.values;
 
-    expect(whereClauses2).toEqual('WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3');
-    expect(values2).toEqual([1, 5, '%searchTerm%']);
-  });
+//     expect(whereClauses2).toEqual('WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3');
+//     expect(values2).toEqual([1, 5, '%searchTerm%']);
+//   });
 
-  test("works even if filterBy is an empty object", function () {
-    const filterBy = {};
+//   test("works even if filterBy is an empty object", function () {
+//     const filterBy = {};
 
-    const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
+//     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
 
-    expect(whereClauses).toEqual('');
-    expect(values).toEqual([]);
-  });
+//     expect(whereClauses).toEqual('');
+//     expect(values).toEqual([]);
+//   });
 
-  test("fails: minEmployees must be smaller than maxEmployees", function () {
-    const filter = {
-      minEmployees: 2,
-      maxEmployees: 1
-    };
+//   test("fails: minEmployees must be smaller than maxEmployees", function () {
+//     const filter = {
+//       minEmployees: 2,
+//       maxEmployees: 1
+//     };
 
-    try {
-      const { whereClauses, values } = Company._sqlForPartialFilter(filter);
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
+//     try {
+//       const { whereClauses, values } = Company._sqlForPartialFilter(filter);
+//       fail();
+//     } catch (err) {
+//       expect(err instanceof BadRequestError).toBeTruthy();
+//     }
+//   });
 
-});
+// });

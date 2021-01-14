@@ -22,8 +22,7 @@ class Job {
        FROM companies
        WHERE handle = $1`,
       [companyHandle]);
-
-    if (checkCompanyExists.rows[0]) {
+    if (checkCompanyExists.rows[0] === undefined) {
       throw new BadRequestError(`Company does not exist: ${companyHandle}`);
     }
 
@@ -103,10 +102,7 @@ class Job {
 
   static async update(id, data) {
     const { setCols, values } = sqlForPartialUpdate(
-      data,
-      {
-        companyHandle: "company_handle"
-      });
+      data);
     const idVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE jobs 
@@ -142,24 +138,24 @@ class Job {
     if (!job) throw new NotFoundError(`No job: ${id}`);
   }
 
-/** Translate data to filter into SQL Format. 
- * Takes in:
- *  filterBy: JS object with key-value pairs to filter in database
- * 
- * Returns:
- *  whereCols: string that contains the where clause of the SQL query 
- *             if filterBy has minEmployees, maxEmployees or name
- *             - empty string if the keys above are not present
- *  values: array of values to search by in the SQL query
- *          - empty array if keys are not present
- *  
- *  Example: 
- * { 
- *    whereCols: "WHERE num_employees >= $1 AND name ILIKE $2",
- *    values: [4, '%searchTerm%']
- * }
- * 
-*/
+  /** Translate data to filter into SQL Format. 
+   * Takes in:
+   *  filterBy: JS object with key-value pairs to filter in database
+   * 
+   * Returns:
+   *  whereCols: string that contains the where clause of the SQL query 
+   *             if filterBy has minEmployees, maxEmployees or name
+   *             - empty string if the keys above are not present
+   *  values: array of values to search by in the SQL query
+   *          - empty array if keys are not present
+   *  
+   *  Example: 
+   * { 
+   *    whereCols: "WHERE num_employees >= $1 AND name ILIKE $2",
+   *    values: [4, '%searchTerm%']
+   * }
+   * 
+  */
 
   static _sqlForPartialFilter(filters = {}) {
     if (Object.keys(filters).length === 0) {
