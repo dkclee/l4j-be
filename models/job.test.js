@@ -208,20 +208,28 @@ describe("get", function () {
 // /************************************** update */
 
 describe("update", function () {
-  const newJob = {
-    title: "newCreated",
-    salary: 500,
-    equity: 0.5,
-    companyHandle: "c1",
-  };
 
-  const updateData = {
-    title: "newUpdate",
-  }
+  let updateData;
+  let id;
+
+  beforeEach(async function () {
+    const newJob = {
+      title: "newCreated",
+      salary: 500,
+      equity: 0.5,
+      companyHandle: "c1",
+    };
+
+    updateData = {
+      title: "newUpdate",
+    }
+
+    let jobCreated = await Job.create(newJob);
+    id = jobCreated.id;
+
+  });
 
   test("works", async function () {
-    let jobCreated = await Job.create(newJob);
-    const id = jobCreated.id;
 
     let job = await Job.update(id, updateData);
     expect(job).toEqual({
@@ -246,8 +254,6 @@ describe("update", function () {
   });
 
   test("works: null fields", async function () {
-    let jobCreated = await Job.create(newJob);
-    const id = jobCreated.id;
 
     const updateDataSetNulls = {
       title: "newUpdate",
@@ -287,8 +293,6 @@ describe("update", function () {
   });
 
   test("bad request with no data", async function () {
-    let jobCreated = await Job.create(newJob);
-    const id = jobCreated.id;
 
     try {
       await Job.update(id, {});
@@ -301,23 +305,34 @@ describe("update", function () {
 
 // /************************************** remove */
 
-// describe("remove", function () {
-//   test("works", async function () {
-//     await Company.remove("c1");
-//     const res = await db.query(
-//       "SELECT handle FROM companies WHERE handle='c1'");
-//     expect(res.rows.length).toEqual(0);
-//   });
+describe("remove", function () {
 
-//   test("not found if no such company", async function () {
-//     try {
-//       await Company.remove("nope");
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });
+  test("works", async function () {
+    const newJob = {
+      title: "newCreated",
+      salary: 500,
+      equity: 0.5,
+      companyHandle: "c1",
+    };
+
+    const jobCreated = await Job.create(newJob);
+    const id = jobCreated.id;
+
+    await Job.remove(id);
+    const res = await db.query(
+      `SELECT id FROM jobs WHERE id=${id}`);
+    expect(res.rows.length).toEqual(0);
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await Job.remove(0);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
 
 // /************************************** _sqlForPartialFilter */
 
