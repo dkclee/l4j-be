@@ -46,12 +46,13 @@ class Job {
   /** Find all jobs.
    * 
    * Takes in optional filter object which can include:
-   *  { }
+   *  { title, minSalary, hasEquity }
    * 
    * Returns [{ id, title, salary, equity, companyHandle }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filters) {
+    const {whereClauses, values} = Job._sqlForPartialFilter(filters)
     const jobRes = await db.query(
       `SELECT id,
               title, 
@@ -59,7 +60,9 @@ class Job {
               equity, 
               company_handle AS "companyHandle"
            FROM jobs
-           ORDER BY title`);
+           ${whereClauses}
+           ORDER BY title`,
+           values);
     return jobRes.rows;
   }
 

@@ -96,79 +96,109 @@ describe("findAll", function () {
     ]);
   });
 
-  // test("works: filter", async function () {
-  //   const filter = {
-  //     name: "c1"
-  //   };
-  //   let companies = await Company.findAll(filter);
-  //   expect(companies).toEqual([
-  //     {
-  //       handle: "c1",
-  //       name: "C1",
-  //       description: "Desc1",
-  //       numEmployees: 1,
-  //       logoUrl: "http://c1.img",
-  //     }
-  //   ]);
+  test("works: filter", async function () {
+    const filter = {
+      title: "3"
+    };
+    let jobs = await Job.findAll(filter);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300,
+        equity: "0.3",
+        companyHandle: "c2",
+      }
+    ]);
 
-  //   const filter2 = {
-  //     minEmployees: 3
-  //   };
-  //   companies = await Company.findAll(filter2);
-  //   expect(companies).toEqual([
-  //     {
-  //       handle: "c3",
-  //       name: "C3",
-  //       description: "Desc3",
-  //       numEmployees: 3,
-  //       logoUrl: "http://c3.img",
-  //     }
-  //   ]);
+    const filter2 = {
+      minSalary: 200
+    };
+    jobs = await Job.findAll(filter2);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200,
+        equity: "0.2",
+        companyHandle: "c2",
+      },
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300,
+        equity: "0.3",
+        companyHandle: "c2",
+      }
+    ]);
 
-  //   const filter3 = {
-  //     maxEmployees: 2
-  //   };
-  //   companies = await Company.findAll(filter3);
-  //   expect(companies).toEqual([
-  //     {
-  //       handle: "c1",
-  //       name: "C1",
-  //       description: "Desc1",
-  //       numEmployees: 1,
-  //       logoUrl: "http://c1.img",
-  //     },
-  //     {
-  //       handle: "c2",
-  //       name: "C2",
-  //       description: "Desc2",
-  //       numEmployees: 2,
-  //       logoUrl: "http://c2.img",
-  //     }
-  //   ]);
+    const filter3 = {
+      hasEquity: false
+    };
+    jobs = await Job.findAll(filter3);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j1",
+        salary: 100,
+        equity: "0.1",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200,
+        equity: "0.2",
+        companyHandle: "c2",
+      },
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300,
+        equity: "0.3",
+        companyHandle: "c2",
+      },
+    ]);
 
-  //   // More complicated filtering
-  //   const filter4 = {
-  //     minEmployees: 2,
-  //     maxEmployees: 3
-  //   };
-  //   companies = await Company.findAll(filter4);
-  //   expect(companies).toEqual([
-  //     {
-  //       handle: "c2",
-  //       name: "C2",
-  //       description: "Desc2",
-  //       numEmployees: 2,
-  //       logoUrl: "http://c2.img",
-  //     },
-  //     {
-  //       handle: "c3",
-  //       name: "C3",
-  //       description: "Desc3",
-  //       numEmployees: 3,
-  //       logoUrl: "http://c3.img",
-  //     }
-  //   ]);
-  // });
+    // More complicated filtering
+    const filter4 = {
+      minSalary: 200,
+      hasEquity: true
+    };
+    jobs = await Job.findAll(filter4);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200,
+        equity: "0.2",
+        companyHandle: "c2",
+      },
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300,
+        equity: "0.3",
+        companyHandle: "c2",
+      },
+    ]);
+
+    const filter5 = {
+      title: "2",
+      minSalary: 200,
+      hasEquity: true
+    };
+    jobs = await Job.findAll(filter5);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200,
+        equity: "0.2",
+        companyHandle: "c2",
+      }
+    ]);
+  });
 });
 
 /************************************** get */
