@@ -279,3 +279,28 @@ describe("applyForJob", function () {
     }
   });
 });
+
+/************************************** _generateRandomPassword */
+
+describe("_generateRandomPassword", function () {
+  test("works for different lengths", async function () {
+    let randomLength = Math.round(Math.random() * (10));
+    let password = User._generateRandomPassword(randomLength);
+    
+    expect(password.length).toEqual(randomLength);
+    expect(password).toEqual(expect.any(String));
+
+    let randomLength2 = Math.round(Math.random() * (10));
+    let password2 = User._generateRandomPassword(randomLength2);
+    
+    expect(password2.length).toEqual(randomLength2);
+    expect(password2).toEqual(expect.any(String));
+  });
+
+  test("works for default length", async function () {
+    let password = User._generateRandomPassword();
+    
+    expect(password.length).toEqual(10);
+    expect(password).toEqual(expect.any(String));
+  });
+});

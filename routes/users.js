@@ -19,7 +19,8 @@ const router = express.Router();
  *
  * Adds a new user. This is not the registration endpoint --- instead, this is
  * only for admin users to add new users. The new user being added can be an
- * admin.
+ * admin. When an admin creates a new user, their password is randomly set which
+ * the user can change later on. 
  *
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }

@@ -11,6 +11,8 @@ const {
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
+const generator = require("generate-password");
+
 /** Related functions for users. */
 
 class User {
@@ -68,6 +70,8 @@ class User {
     if (duplicateCheck.rows[0]) {
       throw new BadRequestError(`Duplicate username: ${username}`);
     }
+
+    password = password || User._generateRandomPassword(10);
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
@@ -283,6 +287,15 @@ class User {
     await db.query(`
       INSERT INTO applications (username, job_id)
       VALUES ($1, $2)`, [username, jobId]);
+  }
+
+  /** Generates a password of length made up of letters and numbers*/
+  static _generateRandomPassword(length=10){
+    // Generate a random password
+    return generator.generate({
+      length,
+      numbers: true
+    });
   }
 }
 
