@@ -8,6 +8,7 @@ const { createToken } = require("../helpers/tokens");
 
 // TODO: fill this out
 // const testJobIds = [];
+let testJobIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -69,26 +70,37 @@ async function commonBeforeAll() {
   
 
   // TODO can store the job ids in a variable here so we don't need to call Job.create in the tests.
-  await Job.create({
+  let resp = await Job.create({
     title: 'j1', 
     salary: 100,
     equity: 0.1,
     companyHandle: 'c1'
   })
 
-  await Job.create({
+  testJobIds.push(resp.id);
+
+  resp = await Job.create({
     title: 'j2', 
     salary: 200,
     equity: 0.2,
     companyHandle: 'c2'
   })
 
-  await Job.create({
+  testJobIds.push(resp.id);
+
+  resp = await Job.create({
     title: 'j3', 
     salary: 300,
     equity: 0.3,
     companyHandle: 'c2'
   })
+
+  testJobIds.push(resp.id);
+
+  await User.applyForJob('u1', testJobIds[0]);
+  
+  await User.applyForJob('u1', testJobIds[1]);
+
 }
 
 async function commonBeforeEach() {
@@ -115,4 +127,5 @@ module.exports = {
   commonAfterAll,
   u1Token,
   u2Token,
+  testJobIds,
 };

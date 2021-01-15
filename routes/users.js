@@ -40,8 +40,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 });
 
 
-/** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
- *
+/** GET / => { users: [ {username, firstName, lastName, email, jobs }, ... ] }
+ *          where jobs: [ jobId, jobId ...]
  * Returns list of all users.
  *
  * Authorization required: admin
@@ -55,8 +55,8 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, isAdmin }
- *
+ * Returns { username, firstName, lastName, isAdmin, jobs }
+ *      where jobs: [ jobId, jobId ...]
  * Authorization required: admin or self
  **/
 
@@ -96,6 +96,21 @@ router.patch("/:username", ensureAdminOrSelf, async function (req, res, next) {
 router.delete("/:username", ensureAdminOrSelf, async function (req, res, next) {
   await User.remove(req.params.username);
   return res.json({ deleted: req.params.username });
+});
+
+
+/** POST /[username]/jobs/[id]  =>  { applied: jobId }
+ * 
+ * Create a job application for a given username and job id. 
+ *
+ * Authorization required: admin or self
+ **/
+
+router.post("/:username/jobs/:id", 
+            ensureAdminOrSelf, 
+            async function (req, res, next) {
+  await User.applyForJob(req.params.username, req.params.id);
+  return res.json({ applied: +req.params.id });
 });
 
 
