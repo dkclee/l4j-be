@@ -123,13 +123,13 @@ class User {
     );
 
     // [{username, jobId}, ...]
-    let userJobsInfo = usersJobsResult.rows;
+    let userJobInfos = usersJobsResult.rows;
     
-    //  {"u1": [j1, j2], "u2": [], "u3": []}
+    //  {"u1": [j1, j2]}
     let usernameToJobs = {};
 
 
-    for (let userJobInfo of userJobsInfo) {
+    for (let userJobInfo of userJobInfos) {
       let {username, jobId} = userJobInfo;
 
       if (usernameToJobs[username] === undefined) {
@@ -288,3 +288,7 @@ class User {
 
 
 module.exports = User;
+
+
+// Using try and catch with parsing the error object
+// "INSERT INTO applications (username, job_id) SELECT username, job_id FROM"

@@ -41,7 +41,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 
 /** GET / => { users: [ {username, firstName, lastName, email, jobs }, ... ] }
- *          where jobs: [ jobId, jobId ...]
+ *          where jobs: [ jobId, jobId, ...]
  * Returns list of all users.
  *
  * Authorization required: admin
@@ -56,7 +56,7 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 /** GET /[username] => { user }
  *
  * Returns { username, firstName, lastName, isAdmin, jobs }
- *      where jobs: [ jobId, jobId ...]
+ *      where jobs: [ jobId, jobId, ...]
  * Authorization required: admin or self
  **/
 

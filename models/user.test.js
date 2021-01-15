@@ -243,13 +243,15 @@ describe("applyForJob", function () {
     const res = await db.query(
         `SELECT username, job_id AS "jobId"
           FROM applications 
-          WHERE username='u2' AND job_id = ${testJobIds[0]}`);
+          WHERE username='u2' AND job_id = $1`,
+          [testJobIds[0]]);
     expect(res.rows[0]).toEqual({
       username: 'u2',
       jobId: testJobIds[0]
     });
   });
 
+  // TODO: expect(err.msg).contains("Some error message")
   test("not found if no such user", async function () {
     try {
       await User.applyForJob("nope", testJobIds[0]);
