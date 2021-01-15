@@ -103,17 +103,47 @@ class User {
    **/
 
   static async findAll() {
-    const result = await db.query(
+    const userResult = await db.query(
       `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email,
+              is_admin AS "isAdmin"
            FROM users
            ORDER BY username`,
     );
 
-    return result.rows;
+    let users = userResult.rows;
+
+    const usersJobsResult = await db.query(
+      `SELECT username,
+              job_id AS "jobId"
+           FROM applications
+           ORDER BY username`,
+    );
+
+    // [{username, jobId}, ...]
+    let userJobsInfo = usersJobsResult.rows;
+    
+    //  {"u1": [j1, j2], "u2": [], "u3": []}
+    let usernameToJobs = {};
+
+
+    for (let userJobInfo of userJobsInfo) {
+      let {username, jobId} = userJobInfo;
+
+      if (usernameToJobs[username] === undefined) {
+        usernameToJobs[username] = [jobId];
+      } else {
+        usernameToJobs[username].push(jobId);
+      }
+    }
+
+    for(let user of users) {
+      user.jobs = usernameToJobs[user.username] || [];
+    }
+
+    return users;
   }
 
   /** Given a username, return data about user.
@@ -127,10 +157,10 @@ class User {
   static async get(username) {
     const userRes = await db.query(
       `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email,
+              is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
       [username],
@@ -139,6 +169,14 @@ class User {
     const user = userRes.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+
+    const jobRes = await db.query(
+      `SELECT job_id AS "jobId"
+           FROM applications
+           WHERE username = $1`,
+           [username]);
+
+    user.jobs = jobRes.rows.map(j => j.jobId);
 
     return user;
   }
