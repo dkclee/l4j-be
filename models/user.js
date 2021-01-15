@@ -12,6 +12,8 @@ const {
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 const STATES = new Set(['interested', 'applied', 'accepted', 'rejected']);
 
+const generator = require("generate-password");
+
 /** Related functions for users. */
 
 class User {
@@ -69,6 +71,8 @@ class User {
     if (duplicateCheck.rows[0]) {
       throw new BadRequestError(`Duplicate username: ${username}`);
     }
+
+    password = password || User._generateRandomPassword(10);
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
@@ -286,6 +290,7 @@ class User {
       VALUES ($1, $2, 'applied')`, [username, jobId]);
   }
 
+<<<<<<< HEAD
   
   /** Given a username and jobId and status, update status for
    * job application.
@@ -334,6 +339,16 @@ class User {
     SET state=$1
     WHERE username=$2 AND job_id=$3`, [state, username, jobId ]);
 }
+=======
+  /** Generates a password of length made up of letters and numbers*/
+  static _generateRandomPassword(length=10){
+    // Generate a random password
+    return generator.generate({
+      length,
+      numbers: true
+    });
+  }
+>>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
 }
 
 
