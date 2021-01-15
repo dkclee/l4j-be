@@ -10,6 +10,7 @@ const {
 } = require("../expressError");
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const STATES = new Set(['interested', 'applied', 'accepted', 'rejected']);
 
 /** Related functions for users. */
 
@@ -281,9 +282,58 @@ class User {
 
     // create new job application
     await db.query(`
-      INSERT INTO applications (username, job_id)
-      VALUES ($1, $2)`, [username, jobId]);
+      INSERT INTO applications (username, job_id, state)
+      VALUES ($1, $2, 'applied')`, [username, jobId]);
   }
+
+  
+  /** Given a username and jobId and status, update status for
+   * job application.
+   * 
+   * Throws NotFoundError if username, jobId, or app is not found.
+   * Throw bad request error if state is invalid
+  */
+
+ static async updateAppStatus(username, jobId, state) {
+  // check if job exists
+  const jobRes = await db.query(
+    `SELECT id
+         FROM jobs
+         WHERE id = $1`,
+    [jobId]);
+  const job = jobRes.rows[0];
+  if (!job) throw new NotFoundError(`No job: ${jobId}`);
+
+  // check if user exists
+  const userRes = await db.query(
+    `SELECT username
+         FROM users
+         WHERE username = $1`,
+    [username],
+  );
+  const user = userRes.rows[0];
+  if (!user) throw new NotFoundError(`No user: ${username}`);
+
+  // check if application exists
+  const appRes = await db.query(
+    `SELECT username, job_id AS "jobId"
+        FROM applications 
+        WHERE username=$1 AND job_id = $2`,
+    [username, jobId]);
+  const application = appRes.rows[0];
+  if (!application) throw new NotFoundError(`
+    No application: ${username}, ${jobId}`);
+
+  // check if state is valid
+  if (STATES.has(state) === false) throw new BadRequestError(`
+    Invalid state: ${state}`);
+
+  // update job application
+  await db.query(`
+    UPDATE applications 
+    SET state=$1
+    WHERE username=$2 AND job_id=$3`, [state, username, jobId ]);
+}
 }
 
 

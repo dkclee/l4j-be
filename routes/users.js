@@ -114,4 +114,19 @@ router.post("/:username/jobs/:id",
 });
 
 
+/** PATCH /[username]/jobs/[id]  =>  { updated: state }
+ * 
+ * Update a job application for a given username and job id and state. 
+ *
+ * Authorization required: admin or self
+ **/
+
+router.patch("/:username/jobs/:id", 
+            ensureAdminOrSelf, 
+            async function (req, res, next) {
+  await User.updateAppStatus(req.params.username, req.params.id, req.body.state);
+  return res.json({ updated: req.body.state });
+});
+
+
 module.exports = router;

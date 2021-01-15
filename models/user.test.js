@@ -119,7 +119,7 @@ describe("findAll", function () {
         lastName: "U1L",
         email: "u1@email.com",
         isAdmin: false,
-        jobs: [ testJobIds[0], testJobIds[1] ],
+        jobs: [testJobIds[0], testJobIds[1]],
       },
       {
         username: "u2",
@@ -144,7 +144,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
-      jobs: [ testJobIds[0], testJobIds[1] ],
+      jobs: [testJobIds[0], testJobIds[1]],
     });
   });
 
@@ -220,7 +220,7 @@ describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
     const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+      "SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 
@@ -241,10 +241,10 @@ describe("applyForJob", function () {
   test("works", async function () {
     await User.applyForJob("u2", testJobIds[0]);
     const res = await db.query(
-        `SELECT username, job_id AS "jobId"
+      `SELECT username, job_id AS "jobId"
           FROM applications 
           WHERE username='u2' AND job_id = $1`,
-          [testJobIds[0]]);
+      [testJobIds[0]]);
     expect(res.rows[0]).toEqual({
       username: 'u2',
       jobId: testJobIds[0]
@@ -276,6 +276,61 @@ describe("applyForJob", function () {
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+});
+
+/************************************** updateAppStatus */
+
+describe("updateAppStatus", function () {
+  test("works", async function () {
+    await User.updateAppStatus("u1", testJobIds[0], 'accepted');
+    const res = await db.query(
+      `SELECT username, job_id AS "jobId", state
+          FROM applications 
+          WHERE username='u1' AND job_id = $1`,
+      [testJobIds[0]]);
+    expect(res.rows[0]).toEqual({
+      username: 'u1',
+      jobId: testJobIds[0],
+      state: "accepted"
+    });
+  });
+
+  // TODO: expect(err.msg).contains("Some error message")
+  test("not found if no such user", async function () {
+    try {
+      await User.updateAppStatus("nope", testJobIds[0], 'accepted');
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await User.updateAppStatus("u1", 0, 'accepted');
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("bad request if state is not ‘interested’, ‘applied’, ‘accepted’, ‘rejected’", async function () {
+    try {
+      await User.updateAppStatus("u1", testJobIds[0], 'nope');
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("not found if application doesn't exist", async function () {
+    try {
+      await User.updateAppStatus("u2", testJobIds[0], 'accepted');
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
     }
   });
 });
