@@ -31,5 +31,8 @@
   },
   "devDependencies": {
     "supertest": "^5.0.0"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
