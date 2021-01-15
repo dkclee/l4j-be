@@ -26,18 +26,6 @@ afterAll(commonAfterAll);
 describe("POST /users", function () {
   test("works for admins: create non-admin", async function () {
     const resp = await request(app)
-<<<<<<< HEAD
-      .post("/users")
-      .send({
-        username: "u-new",
-        firstName: "First-new",
-        lastName: "Last-newL",
-        password: "password-new",
-        email: "new@email.com",
-        isAdmin: false,
-      })
-      .set("authorization", `Bearer ${u1Token}`);
-=======
         .post("/users")
         .send({
           username: "u-new",
@@ -48,7 +36,6 @@ describe("POST /users", function () {
           isAdmin: false,
         })
         .set("authorization", `Bearer ${u1Token}`);
->>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
       user: {
@@ -63,18 +50,6 @@ describe("POST /users", function () {
 
   test("works for admins: create admin", async function () {
     const resp = await request(app)
-<<<<<<< HEAD
-      .post("/users")
-      .send({
-        username: "u-new",
-        firstName: "First-new",
-        lastName: "Last-newL",
-        password: "password-new",
-        email: "new@email.com",
-        isAdmin: true,
-      })
-      .set("authorization", `Bearer ${u1Token}`);
-=======
         .post("/users")
         .send({
           username: "u-new",
@@ -85,7 +60,6 @@ describe("POST /users", function () {
           isAdmin: true,
         })
         .set("authorization", `Bearer ${u1Token}`);
->>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
       user: {
@@ -114,18 +88,6 @@ describe("POST /users", function () {
 
   test("unauth for non-admin", async function () {
     const resp = await request(app)
-<<<<<<< HEAD
-      .post("/users")
-      .send({
-        username: "u-new",
-        firstName: "First-new",
-        lastName: "Last-newL",
-        password: "password-new",
-        email: "new@email.com",
-        isAdmin: true,
-      })
-      .set("authorization", `Bearer ${u2Token}`);
-=======
         .post("/users")
         .send({
           username: "u-new",
@@ -136,7 +98,6 @@ describe("POST /users", function () {
           isAdmin: true,
         })
         .set("authorization", `Bearer ${u2Token}`);
->>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
     expect(resp.statusCode).toEqual(401);
   });
 
@@ -152,18 +113,6 @@ describe("POST /users", function () {
 
   test("bad request if invalid data", async function () {
     const resp = await request(app)
-<<<<<<< HEAD
-      .post("/users")
-      .send({
-        username: "u-new",
-        firstName: "First-new",
-        lastName: "Last-newL",
-        password: "password-new",
-        email: "not-an-email",
-        isAdmin: true,
-      })
-      .set("authorization", `Bearer ${u1Token}`);
-=======
         .post("/users")
         .send({
           username: "u-new",
@@ -174,7 +123,6 @@ describe("POST /users", function () {
           isAdmin: true,
         })
         .set("authorization", `Bearer ${u1Token}`);
->>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
     expect(resp.statusCode).toEqual(400);
   });
 });

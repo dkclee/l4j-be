@@ -280,7 +280,6 @@ describe("applyForJob", function () {
   });
 });
 
-<<<<<<< HEAD
 /************************************** updateAppStatus */
 
 describe("updateAppStatus", function () {
@@ -335,7 +334,6 @@ describe("updateAppStatus", function () {
     }
   });
 });
-=======
 /************************************** _generateRandomPassword */
 
 describe("_generateRandomPassword", function () {
@@ -360,4 +358,3 @@ describe("_generateRandomPassword", function () {
     expect(password).toEqual(expect.any(String));
   });
 });
->>>>>>> 5dead9c8b4c3a8d6d1e650d61ea10f674b5fdd81
