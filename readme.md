@@ -4,10 +4,10 @@ This is the Express backend for [L4J](http://l4j.demo.dkclee.com/).
 
 ## Motivation
 <!-- A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists. -->
-Wanting to learn more about how to design a backend for a React
+Wanting to learn more about how to design a back-end app for a React
 app in the front-end, Express was chosen to provide a smooth transition
 from working on the frontend to the backend since they are both in the
-same programming language (JavaScript).  
+same programming language (JavaScript). 
 
 <!-- ## Build status
 Build status of continus integration i.e. travis, appveyor etc. Ex. - 
