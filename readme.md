@@ -45,6 +45,7 @@ In order to host the project locally, follow these steps
     npm start
 
 In a new terminal tab (cmd + t) for the frontend
+
     cd ..
     git clone https://github.com/d-lee84/l4j-fe.git
     cd l4j-fe
