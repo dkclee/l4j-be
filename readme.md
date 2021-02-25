@@ -31,6 +31,7 @@ Include logo/demo screenshot etc. -->
 - [bCrypt](https://github.com/kelektiv/node.bcrypt.js)
 - [JSON Schema](https://github.com/tdegrunt/jsonschema)
 - [JSON Web Token](https://github.com/auth0/node-jsonwebtoken)
+- [PostgreSQL](https://www.postgresql.org/)
 
 ## Features
 
