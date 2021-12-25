@@ -1,5 +1,3 @@
-"use strict";
-
 const jwt = require("jsonwebtoken");
 const { UnauthorizedError } = require("../expressError");
 const {
@@ -9,15 +7,15 @@ const {
   ensureAdminOrSelf,
 } = require("./auth");
 
-
 const { SECRET_KEY } = require("../config");
+
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
 const badJwt = jwt.sign({ username: "test", isAdmin: false }, "wrong");
 
-/************************************** authenticateJWT */
+/** ************************************ authenticateJWT */
 
-describe("authenticateJWT", function () {
-  test("works: via header", function () {
+describe("authenticateJWT", () => {
+  test("works: via header", () => {
     expect.assertions(2);
     const req = { headers: { authorization: `Bearer ${testJwt}` } };
     const res = { locals: {} };
@@ -34,7 +32,7 @@ describe("authenticateJWT", function () {
     });
   });
 
-  test("works: no header", function () {
+  test("works: no header", () => {
     expect.assertions(2);
     const req = {};
     const res = { locals: {} };
@@ -45,7 +43,7 @@ describe("authenticateJWT", function () {
     expect(res.locals).toEqual({});
   });
 
-  test("works: invalid token", function () {
+  test("works: invalid token", () => {
     expect.assertions(2);
     const req = { headers: { authorization: `Bearer ${badJwt}` } };
     const res = { locals: {} };
@@ -57,10 +55,10 @@ describe("authenticateJWT", function () {
   });
 });
 
-/************************************** ensureLoggedIn */
+/** ************************************ ensureLoggedIn */
 
-describe("ensureLoggedIn", function () {
-  test("works", function () {
+describe("ensureLoggedIn", () => {
+  test("works", () => {
     expect.assertions(1);
     const req = {};
     const res = { locals: { user: { username: "test", isAdmin: false } } };
@@ -70,7 +68,7 @@ describe("ensureLoggedIn", function () {
     ensureLoggedIn(req, res, next);
   });
 
-  test("unauth if no login", function () {
+  test("unauth if no login", () => {
     expect.assertions(1);
     const req = {};
     const res = { locals: {} };
@@ -81,10 +79,10 @@ describe("ensureLoggedIn", function () {
   });
 });
 
-/************************************** ensureAdmin */
-// NOTE: in this function, we did a different type of testing since we removed the try/catch statement from the ensureAdmin. 
-describe("ensureAdmin", function () {
-  test("works", function () {
+/** ************************************ ensureAdmin */
+// NOTE: in this function, we did a different type of testing since we removed the try/catch statement from the ensureAdmin.
+describe("ensureAdmin", () => {
+  test("works", () => {
     expect.assertions(1);
     const req = {};
     const res = { locals: { user: { username: "test", isAdmin: true } } };
@@ -94,30 +92,33 @@ describe("ensureAdmin", function () {
     ensureAdmin(req, res, next);
   });
 
-  test("unauth if no login", function () {
+  test("unauth if no login", () => {
     const req = {};
     const res = { locals: {} };
-    expect(() => { ensureAdmin(req, res) } ).toThrow(UnauthorizedError);
+    expect(() => {
+      ensureAdmin(req, res);
+    }).toThrow(UnauthorizedError);
   });
 
-
-  test("unauth if not admin", function () {
+  test("unauth if not admin", () => {
     const req = {};
     const res = { locals: { user: { username: "test", isAdmin: false } } };
-    expect(() => { ensureAdmin(req, res) } ).toThrow(UnauthorizedError);
+    expect(() => {
+      ensureAdmin(req, res);
+    }).toThrow(UnauthorizedError);
   });
 });
 
-/************************************** ensureAdminOrSelf */
+/** ************************************ ensureAdminOrSelf */
 
-describe("ensureAdminOrSelf", function () {
-  test("works if user is admin and is self", function () {
+describe("ensureAdminOrSelf", () => {
+  test("works if user is admin and is self", () => {
     expect.assertions(1);
     const req = {
       params: {
-        username: "test"
-      }
-    };    
+        username: "test",
+      },
+    };
     const res = { locals: { user: { username: "test", isAdmin: true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -125,13 +126,13 @@ describe("ensureAdminOrSelf", function () {
     ensureAdminOrSelf(req, res, next);
   });
 
-  test("works if user is admin but not self", function () {
+  test("works if user is admin but not self", () => {
     expect.assertions(1);
     const req = {
       params: {
-        username: "notTest"
-      }
-    };    
+        username: "notTest",
+      },
+    };
     const res = { locals: { user: { username: "test", isAdmin: true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -139,12 +140,12 @@ describe("ensureAdminOrSelf", function () {
     ensureAdminOrSelf(req, res, next);
   });
 
-  test("works if non-admin user is self", function () {
+  test("works if non-admin user is self", () => {
     expect.assertions(1);
     const req = {
       params: {
-        username: "test"
-      }
+        username: "test",
+      },
     };
     const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
@@ -153,13 +154,12 @@ describe("ensureAdminOrSelf", function () {
     ensureAdminOrSelf(req, res, next);
   });
 
-
-  test("unauth if not an admin and not self", function () {
+  test("unauth if not an admin and not self", () => {
     expect.assertions(1);
     const req = {
       params: {
-        username: "notTest"
-      }
+        username: "notTest",
+      },
     };
     const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
@@ -168,12 +168,12 @@ describe("ensureAdminOrSelf", function () {
     ensureAdminOrSelf(req, res, next);
   });
 
-  test("unauth if no login", function () {
+  test("unauth if no login", () => {
     expect.assertions(1);
     const req = {
       params: {
-        username: "notTest"
-      }
+        username: "notTest",
+      },
     };
     const res = { locals: {} };
     const next = function (err) {

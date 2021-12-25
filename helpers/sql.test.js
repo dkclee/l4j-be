@@ -1,12 +1,10 @@
-"use strict";
-
 const { sqlForPartialUpdate } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 /* Test for sqlForPartialUpdate */
 
-describe("sqlForPartialUpdate", function () {
-  test("works with valid data", function () {
+describe("sqlForPartialUpdate", () => {
+  test("works with valid data", () => {
     const dataToUpdate = { firstName: "test", age: 3 };
     const jsToSql = { firstName: "first_name" };
 
@@ -16,7 +14,7 @@ describe("sqlForPartialUpdate", function () {
     expect(values).toEqual(["test", 3]);
   });
 
-  test("works even if jsToSql is empty", function () {
+  test("works even if jsToSql is empty", () => {
     const dataToUpdate = { last_name: "test2", age: 15 };
     const jsToSql = {};
 
@@ -26,7 +24,7 @@ describe("sqlForPartialUpdate", function () {
     expect(values).toEqual(["test2", 15]);
   });
 
-  test("BadRequestError if dataToUpdate is empty", function () {
+  test("BadRequestError if dataToUpdate is empty", () => {
     const dataToUpdate = {};
     const jsToSql = { firstName: "first_name" };
 
@@ -37,6 +35,4 @@ describe("sqlForPartialUpdate", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
-
 });
-

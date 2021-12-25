@@ -1,5 +1,3 @@
-"use strict";
-
 /** Database setup for l4j. */
 
 const { Client } = require("pg");

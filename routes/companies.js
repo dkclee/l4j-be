@@ -1,5 +1,3 @@
-"use strict";
-
 /** Routes for companies. */
 
 const jsonschema = require("jsonschema");
@@ -15,7 +13,6 @@ const companiesFilterSchema = require("../schemas/companiesFilter.json");
 
 const router = new express.Router();
 
-
 /** POST / { company } =>  { company }
  *
  * company should be { handle, name, description, numEmployees, logoUrl }
@@ -25,10 +22,10 @@ const router = new express.Router();
  * Authorization required: admin
  */
 
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.post("/", ensureAdmin, async (req, res, next) => {
   const validator = jsonschema.validate(req.body, companyNewSchema);
   if (!validator.valid) {
-    const errs = validator.errors.map(e => e.stack);
+    const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
 
@@ -47,13 +44,13 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: none
  */
 
-router.get("/", async function (req, res, next) {
+router.get("/", async (req, res, next) => {
   const validator = jsonschema.validate(req.query, companiesFilterSchema);
   if (!validator.valid) {
-    const errs = validator.errors.map(e => e.stack);
+    const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
-  
+
   const companies = await Company.findAll(req.query);
   return res.json({ companies });
 });
@@ -66,7 +63,7 @@ router.get("/", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.get("/:handle", async function (req, res, next) {
+router.get("/:handle", async (req, res, next) => {
   const company = await Company.get(req.params.handle);
   return res.json({ company });
 });
@@ -82,10 +79,10 @@ router.get("/:handle", async function (req, res, next) {
  * Authorization required: admin
  */
 
-router.patch("/:handle", ensureAdmin, async function (req, res, next) {
+router.patch("/:handle", ensureAdmin, async (req, res, next) => {
   const validator = jsonschema.validate(req.body, companyUpdateSchema);
   if (!validator.valid) {
-    const errs = validator.errors.map(e => e.stack);
+    const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
 
@@ -98,10 +95,9 @@ router.patch("/:handle", ensureAdmin, async function (req, res, next) {
  * Authorization: admin
  */
 
-router.delete("/:handle", ensureAdmin, async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async (req, res, next) => {
   await Company.remove(req.params.handle);
   return res.json({ deleted: req.params.handle });
 });
-
 
 module.exports = router;

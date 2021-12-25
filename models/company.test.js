@@ -1,5 +1,3 @@
-"use strict";
-
 const db = require("../db.js");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const Company = require("./company.js");
@@ -15,9 +13,9 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-/************************************** create */
+/** ************************************ create */
 
-describe("create", function () {
+describe("create", () => {
   const newCompany = {
     handle: "new",
     name: "New",
@@ -26,14 +24,15 @@ describe("create", function () {
     logoUrl: "http://new.img",
   };
 
-  test("works", async function () {
-    let company = await Company.create(newCompany);
+  test("works", async () => {
+    const company = await Company.create(newCompany);
     expect(company).toEqual(newCompany);
 
     const result = await db.query(
       `SELECT handle, name, description, num_employees, logo_url
            FROM companies
-           WHERE handle = 'new'`);
+           WHERE handle = 'new'`
+    );
     expect(result.rows).toEqual([
       {
         handle: "new",
@@ -45,7 +44,7 @@ describe("create", function () {
     ]);
   });
 
-  test("bad request with dupe", async function () {
+  test("bad request with dupe", async () => {
     try {
       await Company.create(newCompany);
       await Company.create(newCompany);
@@ -56,11 +55,11 @@ describe("create", function () {
   });
 });
 
-/************************************** findAll */
+/** ************************************ findAll */
 
-describe("findAll", function () {
-  test("works: no filter", async function () {
-    let companies = await Company.findAll();
+describe("findAll", () => {
+  test("works: no filter", async () => {
+    const companies = await Company.findAll();
     expect(companies).toEqual([
       {
         handle: "c1",
@@ -86,9 +85,9 @@ describe("findAll", function () {
     ]);
   });
 
-  test("works: filter", async function () {
+  test("works: filter", async () => {
     const filter = {
-      name: "c1"
+      name: "c1",
     };
     let companies = await Company.findAll(filter);
     expect(companies).toEqual([
@@ -98,11 +97,11 @@ describe("findAll", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
-      }
+      },
     ]);
 
     const filter2 = {
-      minEmployees: 3
+      minEmployees: 3,
     };
     companies = await Company.findAll(filter2);
     expect(companies).toEqual([
@@ -112,11 +111,11 @@ describe("findAll", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      }
+      },
     ]);
 
     const filter3 = {
-      maxEmployees: 2
+      maxEmployees: 2,
     };
     companies = await Company.findAll(filter3);
     expect(companies).toEqual([
@@ -133,13 +132,13 @@ describe("findAll", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
-      }
+      },
     ]);
 
     // More complicated filtering
     const filter4 = {
       minEmployees: 2,
-      maxEmployees: 3
+      maxEmployees: 3,
     };
     companies = await Company.findAll(filter4);
     expect(companies).toEqual([
@@ -156,16 +155,16 @@ describe("findAll", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      }
+      },
     ]);
   });
 });
 
-/************************************** get */
+/** ************************************ get */
 
-describe("get", function () {
-  test("works", async function () {
-    let company = await Company.get("c1");
+describe("get", () => {
+  test("works", async () => {
+    const company = await Company.get("c1");
     expect(company).toEqual({
       handle: "c1",
       name: "C1",
@@ -175,15 +174,15 @@ describe("get", function () {
       jobs: [
         {
           id: expect.any(Number),
-          title: 'j1', 
+          title: "j1",
           salary: 100,
           equity: "0.1",
-        }
-      ]
+        },
+      ],
     });
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such company", async () => {
     try {
       await Company.get("nope");
       fail();
@@ -193,9 +192,9 @@ describe("get", function () {
   });
 });
 
-/************************************** update */
+/** ************************************ update */
 
-describe("update", function () {
+describe("update", () => {
   const updateData = {
     name: "New",
     description: "New Description",
@@ -203,8 +202,8 @@ describe("update", function () {
     logoUrl: "http://new.img",
   };
 
-  test("works", async function () {
-    let company = await Company.update("c1", updateData);
+  test("works", async () => {
+    const company = await Company.update("c1", updateData);
     expect(company).toEqual({
       handle: "c1",
       ...updateData,
@@ -213,17 +212,20 @@ describe("update", function () {
     const result = await db.query(
       `SELECT handle, name, description, num_employees, logo_url
            FROM companies
-           WHERE handle = 'c1'`);
-    expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: 10,
-      logo_url: "http://new.img",
-    }]);
+           WHERE handle = 'c1'`
+    );
+    expect(result.rows).toEqual([
+      {
+        handle: "c1",
+        name: "New",
+        description: "New Description",
+        num_employees: 10,
+        logo_url: "http://new.img",
+      },
+    ]);
   });
 
-  test("works: null fields", async function () {
+  test("works: null fields", async () => {
     const updateDataSetNulls = {
       name: "New",
       description: "New Description",
@@ -231,7 +233,7 @@ describe("update", function () {
       logoUrl: null,
     };
 
-    let company = await Company.update("c1", updateDataSetNulls);
+    const company = await Company.update("c1", updateDataSetNulls);
     expect(company).toEqual({
       handle: "c1",
       ...updateDataSetNulls,
@@ -240,17 +242,20 @@ describe("update", function () {
     const result = await db.query(
       `SELECT handle, name, description, num_employees, logo_url
            FROM companies
-           WHERE handle = 'c1'`);
-    expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: null,
-      logo_url: null,
-    }]);
+           WHERE handle = 'c1'`
+    );
+    expect(result.rows).toEqual([
+      {
+        handle: "c1",
+        name: "New",
+        description: "New Description",
+        num_employees: null,
+        logo_url: null,
+      },
+    ]);
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such company", async () => {
     try {
       await Company.update("nope", updateData);
       fail();
@@ -259,7 +264,7 @@ describe("update", function () {
     }
   });
 
-  test("bad request with no data", async function () {
+  test("bad request with no data", async () => {
     try {
       await Company.update("c1", {});
       fail();
@@ -269,17 +274,18 @@ describe("update", function () {
   });
 });
 
-/************************************** remove */
+/** ************************************ remove */
 
-describe("remove", function () {
-  test("works", async function () {
+describe("remove", () => {
+  test("works", async () => {
     await Company.remove("c1");
     const res = await db.query(
-      "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT handle FROM companies WHERE handle='c1'"
+    );
     expect(res.rows.length).toEqual(0);
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such company", async () => {
     try {
       await Company.remove("nope");
       fail();
@@ -289,17 +295,16 @@ describe("remove", function () {
   });
 });
 
-/************************************** _sqlForPartialFilter */
+/** ************************************ _sqlForPartialFilter */
 
-
-describe("sqlForPartialFilter", function () {
-  test("works with valid data", function () {
+describe("sqlForPartialFilter", () => {
+  test("works with valid data", () => {
     const filterBy = { minEmployees: 3, name: "searchBy" };
 
     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
 
-    expect(whereClauses).toEqual('WHERE num_employees >= $1 AND name ILIKE $2');
-    expect(values).toEqual([3, '%searchBy%']);
+    expect(whereClauses).toEqual("WHERE num_employees >= $1 AND name ILIKE $2");
+    expect(values).toEqual([3, "%searchBy%"]);
 
     const filterBy2 = { minEmployees: 1, maxEmployees: 5, name: "searchTerm" };
 
@@ -307,23 +312,25 @@ describe("sqlForPartialFilter", function () {
     const whereClauses2 = result.whereClauses;
     const values2 = result.values;
 
-    expect(whereClauses2).toEqual('WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3');
-    expect(values2).toEqual([1, 5, '%searchTerm%']);
+    expect(whereClauses2).toEqual(
+      "WHERE num_employees >= $1 AND num_employees <= $2 AND name ILIKE $3"
+    );
+    expect(values2).toEqual([1, 5, "%searchTerm%"]);
   });
 
-  test("works even if filterBy is an empty object", function () {
+  test("works even if filterBy is an empty object", () => {
     const filterBy = {};
 
     const { whereClauses, values } = Company._sqlForPartialFilter(filterBy);
 
-    expect(whereClauses).toEqual('');
+    expect(whereClauses).toEqual("");
     expect(values).toEqual([]);
   });
 
-  test("fails: minEmployees must be smaller than maxEmployees", function () {
+  test("fails: minEmployees must be smaller than maxEmployees", () => {
     const filter = {
       minEmployees: 2,
-      maxEmployees: 1
+      maxEmployees: 1,
     };
 
     try {
@@ -333,5 +340,4 @@ describe("sqlForPartialFilter", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
-
 });

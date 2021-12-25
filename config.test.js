@@ -1,7 +1,5 @@
-"use strict";
-
-describe("config can come from env", function () {
-  test("works", function() {
+describe("config can come from env", () => {
+  test("works", () => {
     process.env.SECRET_KEY = "abc";
     process.env.PORT = "5000";
     process.env.DATABASE_URL = "other";
@@ -23,5 +21,4 @@ describe("config can come from env", function () {
 
     expect(config.getDatabaseUri()).toEqual("l4j_test");
   });
-})
-
+});
