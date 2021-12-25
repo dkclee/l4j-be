@@ -12,6 +12,7 @@ const authRoutes = require("./routes/auth");
 const companiesRoutes = require("./routes/companies");
 const jobsRoutes = require("./routes/jobs");
 const usersRoutes = require("./routes/users");
+const applicationsRoutes = require("./routes/applications");
 
 const morgan = require("morgan");
 
@@ -26,6 +27,7 @@ app.use("/auth", authRoutes);
 app.use("/companies", companiesRoutes);
 app.use("/jobs", jobsRoutes);
 app.use("/users", usersRoutes);
+app.use("/applications", applicationsRoutes);
 
 
 /** Handle 404 errors -- this matches everything */
