@@ -65,7 +65,8 @@ function ensureAdminOrSelf(req, res, next) {
     // return !undefined if no user is logged in
     // check if both there is a user logged in and if that user is an admin
     let isAdmin = res.locals.user?.isAdmin === true;
-    let isSelf = (req.params.username === res.locals.user?.username);
+    console.log(`{req, res}`, {req: req.query, res: res.locals})
+    let isSelf = ((req.params.username || req.query.username) === res.locals.user?.username);
     if (!isAdmin && !isSelf) throw new UnauthorizedError();
     return next();
   } catch (err) {
